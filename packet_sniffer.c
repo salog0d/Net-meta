@@ -2,9 +2,56 @@
 #include <stdio.h>
 #include <pcap.h>
 #include <string.h>
+#include <netinet/tcp.h>
+#include <netinet/ip.h>
+#include <netinet/udp.h>
+#include <netinet/ether.h>
+#include <netinet/icmp6.h>
+#include <netinet/in.h>
+#include <arpa/inet.h>
 
 #define IFACE_LENGTH 64
 #define MAX_CAPTURED_BYTES 65535
+
+
+
+typedef struct{
+    uint32_t timestamp;
+    uint8_t ip_version;
+
+    union{
+        struct{
+            struct in_addr src_ip;
+            struct in_addr dst_ip;
+        }v4;
+        struct{
+            struct in6_addr src_ip6;
+            struct in6_addr dst_ip6;
+        }v6;
+    }ip;
+
+    uint16_t src_port;
+    uint16_t dst_port; 
+    uint8_t protocol;
+
+    uint8_t direction;
+    uint32_t packet_size;
+    uint32_t flow_id;
+
+}core_metadata;
+
+typedef struct{
+    core_metadata core;
+
+    uint32_t seq_num;
+    uint32_t ack_num;
+    uint8_t flag;
+    uint16_t window_size;
+    uint8_t tcp_state;
+    uint8_t data_offset;
+    uint16_t checksum;
+
+}tcp_metadata;
 
 
 int main(){
